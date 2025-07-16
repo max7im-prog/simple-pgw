@@ -27,3 +27,9 @@ pdn_connection::pdn_connection(uint32_t cp_teid, boost::asio::ip::address_v4 apn
                                boost::asio::ip::address_v4 ue_ip_addr) :
     _apn_gateway(std::move(apn_gw)), _ue_ip_addr(std::move(ue_ip_addr)), _cp_teid(cp_teid) {}
 
+void pdn_connection::add_bearer(std::shared_ptr<bearer> bearer) {
+    auto dp_teid = bearer->get_dp_teid();
+    _bearers[dp_teid] = bearer;
+}
+
+void pdn_connection::remove_bearer(uint32_t dp_teid) { _bearers.erase(dp_teid); }
