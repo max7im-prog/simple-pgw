@@ -32,4 +32,9 @@ void pdn_connection::add_bearer(std::shared_ptr<bearer> bearer) {
     _bearers[dp_teid] = bearer;
 }
 
-void pdn_connection::remove_bearer(uint32_t dp_teid) { _bearers.erase(dp_teid); }
+void pdn_connection::remove_bearer(uint32_t dp_teid) { 
+    _bearers.erase(dp_teid); 
+    if(_default_bearer != nullptr && _default_bearer->get_dp_teid() == dp_teid){
+        _default_bearer = nullptr;
+    }
+}

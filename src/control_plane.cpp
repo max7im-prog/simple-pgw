@@ -1,5 +1,11 @@
 #include <control_plane.h>
 
+uint32_t generate_teid() {
+    static uint32_t next_dp_teid = 1;
+    return next_dp_teid++;
+}
+
+
 void control_plane::add_apn(std::string apn_name, boost::asio::ip::address_v4 apn_gateway) {
     _apns[apn_name] = apn_gateway;
 }
@@ -35,6 +41,8 @@ std::shared_ptr<pdn_connection> control_plane::create_pdn_connection(const std::
                                                                      boost::asio::ip::address_v4 sgw_addr,
                                                                      uint32_t sgw_cp_teid) {
     auto ret = pdn_connection::create(sgw_cp_teid, _apns[apn], sgw_addr);
+    ret->set_sgw_addr(sgw_addr);
+    ret->set_sgw_cp_teid(sgw_cp_teid);
     _pdns_by_ue_ip_addr[sgw_addr] = ret;
     _pdns[sgw_cp_teid] = ret;
     return ret;
@@ -53,21 +61,25 @@ void control_plane::delete_pdn_connection(uint32_t cp_teid) {
 }
 
 std::shared_ptr<bearer> control_plane::create_bearer(const std::shared_ptr<pdn_connection> &pdn, uint32_t sgw_teid) {
-    static uint32_t next_dp_teid = 1;
-
-    uint32_t dp_teid = next_dp_teid++;
+    uint32_t dp_teid = generate_teid();
     auto bearer_ptr = std::make_shared<bearer>(dp_teid, *pdn);
     bearer_ptr->set_sgw_dp_teid(sgw_teid);
 
     _bearers[dp_teid] = bearer_ptr;
     pdn->add_bearer(bearer_ptr);
 
-    if (!pdn->get_default_bearer()) {
-        pdn->set_default_bearer(bearer_ptr);
-    }
-
     return bearer_ptr;
 }
 
 
-void control_plane::delete_bearer(uint32_t dp_teid) { _bearers.erase(dp_teid); }
+void control_plane::delete_bearer(uint32_t dp_teid) { 
+    auto it = _bearers.find(dp_teid);
+    if(it == _bearers.end()){
+        return;
+    }
+    auto bearer_ptr = it->second;
+    auto connection = bearer_ptr->get_pdn_connection();
+    if(connection != nullptr){
+        connection->remove_bearer(dp_teid);
+    }
+    _bearers.erase(dp_teid); }
