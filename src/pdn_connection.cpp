@@ -26,3 +26,4 @@ boost::asio::ip::address_v4 pdn_connection::get_ue_ip_addr() const { return _ue_
 pdn_connection::pdn_connection(uint32_t cp_teid, boost::asio::ip::address_v4 apn_gw,
                                boost::asio::ip::address_v4 ue_ip_addr) :
     _apn_gateway(std::move(apn_gw)), _ue_ip_addr(std::move(ue_ip_addr)), _cp_teid(cp_teid) {}
+
