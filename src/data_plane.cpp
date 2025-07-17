@@ -25,6 +25,6 @@ void data_plane::handle_downlink(const boost::asio::ip::address_v4 &ue_ip, Packe
         return;
     }
     auto sgw_addr = connection->get_sgw_address();
-    uint32_t sgw_dp_teid = bearer->get_dp_teid();
+    uint32_t sgw_dp_teid = bearer->get_sgw_dp_teid();
     forward_packet_to_sgw(sgw_addr, sgw_dp_teid, std::move(packet));
 }
