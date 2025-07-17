@@ -29,4 +29,6 @@ private:
     std::unordered_map<boost::asio::ip::address_v4, std::shared_ptr<pdn_connection>> _pdns_by_ue_ip_addr;
     std::unordered_map<uint32_t, std::shared_ptr<bearer>> _bearers;
     std::unordered_map<std::string, boost::asio::ip::address_v4> _apns;
+    static uint32_t generate_teid();
+    static boost::asio::ip::address_v4 generate_ue_id();
 };

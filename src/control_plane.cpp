@@ -1,14 +1,14 @@
 #include <control_plane.h>
 #include <random>
 
-uint32_t generate_teid() {
+uint32_t control_plane::generate_teid() {
     static std::random_device dev;
     static std::mt19937 rnd(dev());
     static std::uniform_int_distribution<uint32_t> distribution(1, UINT32_MAX - 1);
     return distribution(rnd);
 }
 
-boost::asio::ip::address_v4 generate_ue_id() {
+boost::asio::ip::address_v4 control_plane::generate_ue_id() {
     static std::random_device dev;
     static std::mt19937 rnd(dev());
     static std::uniform_int_distribution<uint8_t> distribution(1, 255);
